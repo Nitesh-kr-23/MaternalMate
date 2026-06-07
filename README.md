@@ -4,6 +4,10 @@ MaternalMate is an AI-powered maternal healthcare monitoring platform that assis
 
 The system classifies maternal health risks into **Low Risk**, **Medium Risk**, and **High Risk** categories based on vital health parameters such as blood pressure, blood glucose, body temperature, heart rate, and age. Additionally, it integrates **Google Gemini AI** to analyze uploaded medical reports and ultrasound reports and generate simplified patient-friendly summaries.
 
+## Live Demo
+
+https://maternalmate.onrender.com
+
 ---
 
 ## Features
