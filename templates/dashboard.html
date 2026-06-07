@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MaternalMate</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-purple-50 min-h-screen">
+    
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-heart text-pink-500 text-2xl mr-3"></i>
+                    <span class="text-2xl font-bold text-gray-800">MaternalMate</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Welcome, <strong>{{ user.username }}</strong></span>
+                    <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="bg-{{ message.tags }}-100 border-l-4 border-{{ message.tags }}-500 text-{{ message.tags }}-700 p-4 rounded-lg mb-2">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Profile Summary Card -->
+        {% if profile and profile.due_date %}
+        <div class="bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl shadow-xl p-6 mb-8 text-white">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-bold mb-2">Your Pregnancy Journey</h2>
+                    <p class="text-pink-100 text-lg">Week {{ profile.current_week }} of 40 | Trimester {{ profile.trimester }}</p>
+                    <p class="mt-2">Due Date: <strong>{{ profile.due_date|date:"F d, Y" }}</strong></p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-white text-purple-600 rounded-full w-24 h-24 flex items-center justify-center text-3xl font-bold">
+                        {{ profile.current_week }}
+                    </div>
+                    <p class="mt-2 text-sm">Weeks</p>
+                </div>
+            </div>
+        </div>
+        {% elif profile and not profile.due_date %}
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-8 rounded-lg">
+            <p class="text-yellow-800">
+                <strong>⚠️ Profile Incomplete:</strong> Please update your due date in your profile to see pregnancy tracking.
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <a href="{% url 'log_health' %}" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition transform hover:-translate-y-1">
+                <div class="flex items-center">
+                    <div class="bg-pink-100 rounded-full p-4 mr-4">
+                        <i class="fas fa-heartbeat text-pink-500 text-3xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Log Health Vitals</h3>
+                        <p class="text-gray-600">Record your daily health metrics</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="{% url 'upload_report' %}" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition transform hover:-translate-y-1">
+                <div class="flex items-center">
+                    <div class="bg-purple-100 rounded-full p-4 mr-4">
+                        <i class="fas fa-file-medical text-purple-500 text-3xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Upload Report</h3>
+                        <p class="text-gray-600">AI-powered report analysis</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Current Risk Status -->
+        {% if latest_log %}
+        <div class="bg-white rounded-xl shadow-xl p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-shield-alt mr-2"></i>Current Health Status
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Risk Level Badge -->
+                <div class="col-span-1 md:col-span-4">
+                    {% if latest_log.risk_level == 'low risk' %}
+                    <div class="bg-green-100 border-l-4 border-green-500 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 text-3xl mr-4"></i>
+                            <div>
+                                <h3 class="text-xl font-bold text-green-800">Low Risk</h3>
+                                <p class="text-green-700">Your vitals are within normal range. Keep up the good work!</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif latest_log.risk_level == 'mid risk' %}
+                    <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-triangle text-yellow-500 text-3xl mr-4"></i>
+                            <div>
+                                <h3 class="text-xl font-bold text-yellow-800">Mid Risk</h3>
+                                <p class="text-yellow-700">Some vitals need attention. Please monitor closely.</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="bg-red-100 border-l-4 border-red-500 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle text-red-500 text-3xl mr-4"></i>
+                            <div>
+                                <h3 class="text-xl font-bold text-red-800">High Risk</h3>
+                                <p class="text-red-700">⚠️ Please consult your healthcare provider immediately!</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Vital Statistics -->
+                <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4">
+                    <h4 class="text-sm text-gray-600 mb-2">Blood Pressure</h4>
+                    <p class="text-2xl font-bold text-gray-800">{{ latest_log.systolic_bp }}/{{ latest_log.diastolic_bp }}</p>
+                    <p class="text-xs text-gray-500">mmHg</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
+                    <h4 class="text-sm text-gray-600 mb-2">Blood Glucose</h4>
+                    <p class="text-2xl font-bold text-gray-800">{{ latest_log.bs }}</p>
+                    <p class="text-xs text-gray-500">mmol/L</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
+                    <h4 class="text-sm text-gray-600 mb-2">Heart Rate</h4>
+                    <p class="text-2xl font-bold text-gray-800">{{ latest_log.heart_rate }}</p>
+                    <p class="text-xs text-gray-500">bpm</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4">
+                    <h4 class="text-sm text-gray-600 mb-2">Body Temp</h4>
+                    <p class="text-2xl font-bold text-gray-800">{{ latest_log.body_temp }}</p>
+                    <p class="text-xs text-gray-500">°F</p>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-500 mt-4">Last updated: {{ latest_log.timestamp|date:"F d, Y - h:i A" }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Charts Section -->
+        {% if has_data %}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Blood Pressure Trend Chart -->
+            <div class="bg-white rounded-xl shadow-xl p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-chart-line mr-2 text-pink-500"></i>Blood Pressure Trend (Last 30 Days)
+                </h2>
+                <div style="height: 300px;">
+                    <canvas id="bpChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Vitals Radar Chart -->
+            <div class="bg-white rounded-xl shadow-xl p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-chart-area mr-2 text-purple-500"></i>Current Vitals vs Normal Range
+                </h2>
+                <div style="height: 300px;">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-blue-100 border-l-4 border-blue-500 p-6 mb-8 rounded-lg">
+            <div class="flex items-center">
+                <i class="fas fa-info-circle text-blue-500 text-3xl mr-4"></i>
+                <div>
+                    <h3 class="text-xl font-bold text-blue-800">No Health Data Yet</h3>
+                    <p class="text-blue-700 mt-2">Start logging your health vitals to see beautiful charts and AI-powered risk predictions!</p>
+                    <a href="{% url 'log_health' %}" class="inline-block mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition">
+                        Log Your First Health Entry
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Reports -->
+        {% if recent_reports %}
+        <div class="bg-white rounded-xl shadow-xl p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-file-medical mr-2"></i>Recent Medical Reports
+            </h2>
+            
+            <div class="space-y-6">
+                {% for report in recent_reports %}
+                <div class="border border-gray-200 rounded-xl p-5 hover:shadow-md transition">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <h3 class="font-bold text-gray-800 text-lg">{{ report.report_type|default:"Medical Report" }}</h3>
+                                <span class="ml-3 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
+                                    {{ report.file_extension }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-600">
+                                <i class="far fa-clock mr-1"></i>
+                                {{ report.created_at|date:"F d, Y - h:i A" }}
+                            </p>
+                        </div>
+                        <a href="{{ report.report_file.url }}" target="_blank" 
+                           class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm transition flex items-center">
+                            <i class="fas fa-download mr-2"></i>View
+                        </a>
+                    </div>
+                    
+                    {% if report.ai_summary %}
+                    <div class="mt-4 bg-gray-50 rounded-lg p-4">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-robot text-purple-500 text-xl mr-2"></i>
+                            <h4 class="font-bold text-gray-800">AI Analysis</h4>
+                        </div>
+                        <div class="ai-summary-content">
+                            {{ report.ai_summary|safe }}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="mt-4 p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                        <p class="text-yellow-800 text-sm">
+                            <i class="fas fa-hourglass-half mr-2"></i>
+                            AI analysis in progress...
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Health Logs Table -->
+        {% if health_logs %}
+        <div class="bg-white rounded-xl shadow-xl p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-history mr-2"></i>Recent Health Logs
+            </h2>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">BP</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Glucose</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Heart Rate</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Risk Level</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for log in health_logs %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm text-gray-700">{{ log.timestamp|date:"M d, Y" }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">{{ log.systolic_bp }}/{{ log.diastolic_bp }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">{{ log.bs }} mmol/L</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">{{ log.heart_rate }} bpm</td>
+                            <td class="px-4 py-3">
+                                {% if log.risk_level == 'low risk' %}
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">Low</span>
+                                {% elif log.risk_level == 'mid risk' %}
+                                <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">Mid</span>
+                                {% else %}
+                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">High</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Chart.js Initialization Script -->
+    <script>
+        // Prepare data from Django context
+        const healthLogs = {{ all_logs_json|safe }};
+        
+        // Only initialize charts if we have data
+        if (healthLogs && healthLogs.length > 0) {
+            // Blood Pressure Trend Chart
+            const bpCtx = document.getElementById('bpChart');
+            if (bpCtx) {
+                new Chart(bpCtx, {
+                    type: 'line',
+                    data: {
+                        labels: healthLogs.map(log => new Date(log.timestamp).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})),
+                        datasets: [
+                            {
+                                label: 'Systolic BP',
+                                data: healthLogs.map(log => log.systolic_bp),
+                                borderColor: 'rgb(239, 68, 68)',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Diastolic BP',
+                                data: healthLogs.map(log => log.diastolic_bp),
+                                borderColor: 'rgb(59, 130, 246)',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: 60,
+                                max: 180,
+                                title: {
+                                    display: true,
+                                    text: 'Blood Pressure (mmHg)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Radar Chart - Current Vitals vs Normal
+            {% if latest_log %}
+            const radarCtx = document.getElementById('radarChart');
+            if (radarCtx) {
+                new Chart(radarCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Systolic BP', 'Diastolic BP', 'Blood Glucose', 'Heart Rate', 'Body Temp'],
+                        datasets: [
+                            {
+                                label: 'Your Current Values',
+                                data: [
+                                    ({{ latest_log.systolic_bp }} / 200 * 100).toFixed(1),
+                                    ({{ latest_log.diastolic_bp }} / 120 * 100).toFixed(1),
+                                    ({{ latest_log.bs }} / 15 * 100).toFixed(1),
+                                    ({{ latest_log.heart_rate }} / 120 * 100).toFixed(1),
+                                    ({{ latest_log.body_temp }} / 105 * 100).toFixed(1)
+                                ],
+                                backgroundColor: 'rgba(236, 72, 153, 0.2)',
+                                borderColor: 'rgb(236, 72, 153)',
+                                pointBackgroundColor: 'rgb(236, 72, 153)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgb(236, 72, 153)',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Normal Range',
+                                data: [
+                                    (100/200*100).toFixed(1), 
+                                    (70/120*100).toFixed(1), 
+                                    (5/15*100).toFixed(1), 
+                                    (80/120*100).toFixed(1), 
+                                    (98/105*100).toFixed(1)
+                                ],
+                                backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                                borderColor: 'rgb(34, 197, 94)',
+                                pointBackgroundColor: 'rgb(34, 197, 94)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgb(34, 197, 94)',
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    stepSize: 20
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            {% endif %}
+        }
+    </script>
+
+</body>
+</html>
