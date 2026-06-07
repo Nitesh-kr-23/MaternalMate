@@ -15,10 +15,6 @@ db.sqlite3
 /media/
 /staticfiles/
 
-# ML Models (will be trained on Render)
-models/*.pkl
-data/*.csv
-
 # IDE
 .vscode/
 .idea/
