@@ -1,4 +1,3 @@
-# core/apps.py
 """
 Application configuration for the core app
 Defines the app name and configuration settings
@@ -11,7 +10,7 @@ class CoreConfig(AppConfig):
     """
     Configuration class for the 'core' application
     """
-    # Use BigAutoField for primary keys (Django 3.2+)
+    # Use BigAutoField for primary keys
     default_auto_field = 'django.db.models.BigAutoField'
     
     # Application name (must match the folder name)

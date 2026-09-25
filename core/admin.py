@@ -1,8 +1,3 @@
-"""
-Django Admin Configuration for MaternalMate
-Customizes the admin interface for easy data management
-"""
-
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import UserProfile, HealthLog, MedicalReport

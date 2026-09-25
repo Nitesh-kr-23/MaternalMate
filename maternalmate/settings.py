@@ -1,7 +1,3 @@
-# Database Configuration Section
-
-# SECURITY WARNING: Keep secret keys secure in production!
-# For production, use environment variables
 import os
 from pathlib import Path
 
@@ -25,7 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',  # Our main app
+    'core',  # main app
 ]
 
 MIDDLEWARE = [
@@ -60,9 +56,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'maternalmate.wsgi.application'
 
 # ==================== DATABASE CONFIGURATION ====================
-# PostgreSQL Production-Ready Configuration
-# Make sure PostgreSQL is installed and running on your system
-# Create database: CREATE DATABASE maternalmate;
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
@@ -83,10 +76,10 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'maternalmate',          # Database name
-            'USER': 'postgres',               # PostgreSQL username
-            'PASSWORD': '****',           # PostgreSQL password
-            'HOST': 'localhost',              # Database host
-            'PORT': '5432',                   # PostgreSQL default port
+            'USER': 'postgres',              
+            'PASSWORD': '****',           
+            'HOST': 'localhost',              
+            'PORT': '5432',                   
             'CONN_MAX_AGE': 600,             # Connection pooling (10 mins)
             'OPTIONS': {
                 'connect_timeout': 10,        # Connection timeout in seconds
@@ -113,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Asia/Kolkata'  # Indian timezone for your project
+TIME_ZONE = 'Asia/Kolkata' 
 USE_I18N = True
 USE_TZ = True
 
@@ -137,7 +130,7 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
-# Email Configuration (for alerts - using console backend for development)
+# Email Configuration
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 else:

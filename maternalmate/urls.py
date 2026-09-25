@@ -1,4 +1,3 @@
-# Project-level URLs
 """
 URL Configuration for MaternalMate
 Links URL patterns to view functions

@@ -1,4 +1,3 @@
-# core/models.py
 """
 Database models for MaternalMate AI-Based Maternal Care Monitoring System
 Models are designed to match the Kaggle Maternal Health Risk Dataset structure

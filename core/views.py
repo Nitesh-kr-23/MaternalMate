@@ -1,4 +1,3 @@
-# core/views.py
 """
 View functions for MaternalMate AI-Based Maternal Care Monitoring System
 Handles dashboard, risk prediction, report analysis, and user authentication

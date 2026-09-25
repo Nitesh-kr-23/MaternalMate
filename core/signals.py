@@ -1,4 +1,3 @@
-# core/signals.py
 """
 Django signals for automatic UserProfile creation
 Automatically creates a UserProfile when a new User is created

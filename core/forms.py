@@ -1,4 +1,3 @@
-# core/forms.py
 """
 Django forms with Tailwind CSS styling for MaternalMate
 Forms include validation and user-friendly error messages
